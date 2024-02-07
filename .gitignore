@@ -1,0 +1,5 @@
+a.out
+*.cmx
+*.cmo
+*.cmi
+*.o
