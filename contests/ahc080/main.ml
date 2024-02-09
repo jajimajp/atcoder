@@ -31,6 +31,10 @@ let input () : t =
   let ofs = List.init m ~f:(fun _ -> input_of ()) in
   { n; m; e; ofs }
 
+(** ２点間の距離の２乗 *)
+let dist_p2 (i1, j1) (i2, j2) =
+  (i1-i2)*(i1-i2) + (j1-j2)*(j1-j2)
+
 exception Break
 let () =
   let t = input () in
@@ -38,9 +42,18 @@ let () =
   let v_tot = (* 石油の全埋蔵量 *)
     t.ofs |> List.map ~f:fst |> List.reduce_exn ~f:(+) in
   let v_found = ref 0 in (* これまでの石油埋蔵量 *)
+  let check_poss = (* 確認する座標の一覧 *)
+    List.Cartesian_product.map2
+      (List.range 0 t.n) (List.range 0 t.n)
+      ~f:(fun a b -> (a, b)) in
+  (* 座標を中心に近い順に並べ替える *)
+  let center = (t.n / 2, t.n / 2) in
+  let check_poss = List.sort check_poss
+      ~compare:(fun p1 p2 ->
+        (dist_p2 p1 center) - (dist_p2 p2 center)) in
   try
-    for i = 0 to t.n - 1 do
-      for j = 0 to t.n - 1 do
+    List.iter check_poss
+      ~f:(fun (i, j) ->
         printf "q 1 %d %d\n" i j;
         Out_channel.flush Out_channel.stdout;
         let inp = read_int () in
@@ -51,8 +64,7 @@ let () =
           pos := (i, j) :: !pos;
         if !v_found = v_tot then
           raise Break
-      done
-    done
+      )
   with
   | Break -> ();
   let ijstr =
