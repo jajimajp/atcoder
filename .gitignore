@@ -3,3 +3,5 @@ a.out
 *.cmo
 *.cmi
 *.o
+
+.DS_Store
