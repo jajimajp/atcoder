@@ -31,19 +31,30 @@ let input () : t =
   let ofs = List.init m ~f:(fun _ -> input_of ()) in
   { n; m; e; ofs }
 
+exception Break
 let () =
   let t = input () in
   let pos = ref [] in (* 油田のある座標 *)
-  for i = 0 to t.n - 1 do
-    for j = 0 to t.n - 1 do
-      printf "q 1 %d %d\n" i j;
-      Out_channel.flush Out_channel.stdout;
-      let inp = read_int () in
-      match inp with
-      | 0 -> ()
-      | _ -> pos := (i, j) :: !pos
+  let v_tot = (* 石油の全埋蔵量 *)
+    t.ofs |> List.map ~f:fst |> List.reduce_exn ~f:(+) in
+  let v_found = ref 0 in (* これまでの石油埋蔵量 *)
+  try
+    for i = 0 to t.n - 1 do
+      for j = 0 to t.n - 1 do
+        printf "q 1 %d %d\n" i j;
+        Out_channel.flush Out_channel.stdout;
+        let inp = read_int () in
+        match inp with
+        | 0 -> ()
+        | n ->
+          v_found := !v_found + n;
+          pos := (i, j) :: !pos;
+        if !v_found = v_tot then
+          raise Break
+      done
     done
-  done;
+  with
+  | Break -> ();
   let ijstr =
     List.map !pos ~f:(fun (i, j) -> Printf.sprintf "%d %d" i j)
     |> String.concat ~sep:" " in
