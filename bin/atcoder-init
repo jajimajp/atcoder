@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+require "pathname"
+require 'fileutils'
+
+def help
+  puts "usage: atcoder-init <dirname>"
+end
+
+if ARGV.length == 0 then
+  help
+  exit 0
+end
+
+script_path = __dir__
+
+src = Pathname(script_path).join("../tmpl")
+dist = Pathname(Dir.pwd).join(ARGV[0])
+
+FileUtils.cp_r(src, dist)
+
+('a'..'g').each do |c|
+  FileUtils.cp(src.join("template.cpp"), dist.join("#{c}.cpp"))
+end
+
+puts "contest directory created at #{dist}"
