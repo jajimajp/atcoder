@@ -2,6 +2,7 @@
 using namespace std;
 #define ll long long
 
+// 素数列挙
 vector<ll> primes_upto(ll upto) {
   vector<ll> is_prime(upto, true);
   vector<ll> primes;
